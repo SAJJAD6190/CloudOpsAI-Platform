@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Recommendations · CloudOpsAI{% endblock %}
+{% block content %}
+<header class="page-header"><div><span class="eyebrow">Human-governed AI</span><h1>Recommendation center</h1><p>Review evidence, confidence, benefits, risk, and approval requirements.</p></div><form method="post" action="/recommendations/generate"><button class="button primary">Generate recommendations</button></form></header>
+<form class="filter-bar" method="get"><select name="status"><option value="">All statuses</option>{% for item in ['pending','approved','rejected','deferred','executed','verified'] %}<option value="{{ item }}" {% if selected_status == item %}selected{% endif %}>{{ item|title }}</option>{% endfor %}</select><button class="button secondary">Filter</button><a class="button ghost" href="/recommendations">Reset</a></form>
+<section class="recommendation-list">
+{% for rec in recommendations %}
+<article class="recommendation-card">
+  <div class="recommendation-top"><div><span class="eyebrow">{{ rec.resource.name if rec.resource else 'General platform' }}</span><h2>{{ rec.action }}</h2></div><div class="score-stack"><span class="status {{ rec.status }}">{{ rec.status }}</span><strong>{{ '%.0f'|format(rec.confidence * 100) }}% confidence</strong></div></div>
+  <div class="recommendation-grid">
+    <div><h3>Reason</h3><p>{{ rec.reason }}</p></div>
+    <div><h3>Evidence</h3><p>{{ rec.evidence }}</p></div>
+    <div><h3>Expected benefit</h3><p>{{ rec.expected_benefit }}</p><strong>Estimated saving: USD {{ '%.2f'|format(rec.expected_saving) }}</strong></div>
+    <div><h3>Possible impact</h3><p>{{ rec.possible_impact }}</p><strong>Risk score: {{ '%.0f'|format(rec.risk_score * 100) }}%</strong></div>
+  </div>
+  <div class="recommendation-footer">
+    <span>Model {{ rec.model_version }} · expires {{ rec.expires_at.strftime('%Y-%m-%d') }} · approval: {{ rec.required_role|replace('_',' ') }}</span>
+    <div class="actions">
+      {% if rec.status == 'pending' %}
+      <form method="post" action="/recommendations/{{ rec.id }}/decision"><input type="hidden" name="decision" value="approve"><button class="button success" data-confirm="Approve this recommendation?">Approve</button></form>
+      <form method="post" action="/recommendations/{{ rec.id }}/decision"><input type="hidden" name="decision" value="defer"><button class="button secondary">Defer</button></form>
+      <form method="post" action="/recommendations/{{ rec.id }}/decision"><input type="hidden" name="decision" value="reject"><button class="button danger" data-confirm="Reject this recommendation?">Reject</button></form>
+      {% elif rec.status == 'approved' %}
+      <form method="post" action="/recommendations/{{ rec.id }}/execute"><button class="button primary" data-confirm="Run the simulated execution? No real cloud resources will change.">Simulate execution</button></form>
+      {% elif rec.status == 'executed' %}
+      <form method="post" action="/recommendations/{{ rec.id }}/verify"><button class="button success">Verify outcome</button></form>
+      {% endif %}
+    </div>
+  </div>
+</article>
+{% else %}<div class="panel empty">No recommendations match this filter.</div>{% endfor %}
+</section>
+{% endblock %}

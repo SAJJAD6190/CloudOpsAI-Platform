@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · CloudOpsAI{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div><span class="eyebrow">Executive overview</span><h1>Multi-cloud operations dashboard</h1><p>Unified cost, health, deployment risk, and recommendation visibility.</p></div>
+  <form method="post" action="/recommendations/generate"><button class="button primary">Generate recommendations</button></form>
+</header>
+<section class="metric-grid">
+  <article class="metric-card"><span>Cloud resources</span><strong>{{ resource_count }}</strong><small>Across connected providers</small></article>
+  <article class="metric-card"><span>Estimated monthly cost</span><strong>USD {{ '%.2f'|format(current_cost) }}</strong><small>Forecast: USD {{ '%.2f'|format(cost_forecast) }}</small></article>
+  <article class="metric-card"><span>Pending recommendations</span><strong>{{ pending }}</strong><small>Awaiting human review</small></article>
+  <article class="metric-card"><span>High-risk deployments</span><strong>{{ high_risk }}</strong><small>Require intervention</small></article>
+</section>
+<section class="dashboard-grid">
+  <article class="panel span-2">
+    <div class="panel-heading"><div><h2>Cloud cost trend</h2><p>Aggregated historical spend across resources.</p></div><span class="pill">Next estimate: USD {{ '%.2f'|format(cost_forecast) }}</span></div>
+    <svg class="sparkline" viewBox="0 0 720 180" role="img" aria-label="Cloud cost trend">
+      <line x1="14" y1="166" x2="706" y2="166" class="chart-axis" />
+      <polyline points="{{ sparkline }}" class="chart-line" />
+      {% for value in cost_values %}
+        {% set x = 14 + loop.index0 * 692 / ([cost_values|length - 1, 1]|max) %}
+      {% endfor %}
+    </svg>
+    <div class="chart-labels">{% for period in cost_periods %}<span>{{ period }}</span>{% endfor %}</div>
+  </article>
+  <article class="panel">
+    <div class="panel-heading"><div><h2>Provider distribution</h2><p>Resources by cloud platform.</p></div></div>
+    <div class="bar-list">
+      {% for provider, count in provider_counts.items() %}
+      <div><div class="bar-label"><span>{{ provider }}</span><strong>{{ count }}</strong></div><div class="bar-track"><span style="width: {{ count / max_provider * 100 }}%"></span></div></div>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+<section class="dashboard-grid">
+  <article class="panel span-2">
+    <div class="panel-heading"><div><h2>Top recommendations</h2><p>Ranked by confidence and expected value.</p></div><a href="/recommendations">View all</a></div>
+    <div class="compact-list">
+      {% for rec in recommendations %}
+      <a href="/recommendations" class="compact-row">
+        <div><strong>{{ rec.action }}</strong><span>{{ rec.resource.name if rec.resource else 'General platform' }}</span></div>
+        <div class="row-meta"><span class="status {{ rec.status }}">{{ rec.status }}</span><strong>{{ '%.0f'|format(rec.confidence * 100) }}%</strong></div>
+      </a>
+      {% else %}<p class="empty">No recommendations available.</p>{% endfor %}
+    </div>
+  </article>
+  <article class="panel">
+    <div class="panel-heading"><div><h2>Recent deployment risk</h2><p>Interpretable release assessments.</p></div><a href="/deployments">Open</a></div>
+    <div class="compact-list">
+      {% for dep in deployments %}
+      <div class="compact-row"><div><strong>{{ dep.version }}</strong><span>{{ dep.provider }} · {{ dep.environment }}</span></div><div class="row-meta"><span class="risk {{ dep.risk_level }}">{{ dep.risk_level }}</span><strong>{{ '%.0f'|format(dep.risk_probability * 100) }}%</strong></div></div>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+{% endblock %}

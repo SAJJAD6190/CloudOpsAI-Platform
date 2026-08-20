@@ -1,0 +1,10 @@
+services:
+  cloudopsai:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      CLOUDOPSAI_SECRET_KEY: local-docker-demo-secret
+      CLOUDOPSAI_DATABASE_URL: sqlite:///./data/cloudopsai.db
+    volumes:
+      - ./data:/app/data

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}CloudOpsAI{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="/dashboard">
+        <span class="brand-mark">C</span>
+        <span><strong>CloudOpsAI</strong><small>Intelligent Operations</small></span>
+      </a>
+      <nav>
+        <a class="{% if request.url.path == '/dashboard' %}active{% endif %}" href="/dashboard">Dashboard</a>
+        <a class="{% if request.url.path == '/resources' %}active{% endif %}" href="/resources">Resources</a>
+        <a class="{% if request.url.path == '/recommendations' %}active{% endif %}" href="/recommendations">Recommendations</a>
+        <a class="{% if request.url.path == '/deployments' %}active{% endif %}" href="/deployments">Deployment Risk</a>
+        {% if user.role in ['cloud_admin', 'security_analyst'] %}
+        <a class="{% if request.url.path == '/audits' %}active{% endif %}" href="/audits">Audit Trail</a>
+        {% endif %}
+        <a href="/docs" target="_blank">API Documentation</a>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="role-badge">{{ user.role|replace('_', ' ')|title }}</span>
+        <strong>{{ user.full_name }}</strong>
+        <small>{{ user.email }}</small>
+        <a href="/logout">Sign out</a>
+      </div>
+    </aside>
+    <main class="main-content">
+      {% if request.query_params.get('notice') %}
+      <div class="notice">{{ request.query_params.get('notice') }}</div>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <script src="{{ url_for('static', path='js/app.js') }}"></script>
+</body>
+</html>

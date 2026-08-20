@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Deployment Risk · CloudOpsAI{% endblock %}
+{% block content %}
+<header class="page-header"><div><span class="eyebrow">CI/CD intelligence</span><h1>Deployment-risk assessments</h1><p>Software evidence combined with current environment conditions.</p></div><a class="button primary" href="/docs#/CloudOpsAI%20API/deployment_risk_api_api_deployments_risk_post" target="_blank">Assess through API</a></header>
+<div class="panel table-panel">
+<table>
+<thead><tr><th>Version</th><th>Provider</th><th>Environment</th><th>Evidence</th><th>Risk</th><th>Probability</th><th>Created</th></tr></thead>
+<tbody>{% for dep in deployments %}<tr><td><strong>{{ dep.version }}</strong></td><td>{{ dep.provider }}</td><td>{{ dep.environment }}</td><td class="wide-cell">{{ dep.reasons }}</td><td><span class="risk {{ dep.risk_level }}">{{ dep.risk_level }}</span></td><td>{{ '%.1f'|format(dep.risk_probability * 100) }}%</td><td>{{ dep.created_at.strftime('%Y-%m-%d %H:%M') }}</td></tr>{% endfor %}</tbody>
+</table>
+</div>
+<div class="panel info-panel"><h2>Try a new risk assessment</h2><p>Open the interactive Swagger page and use <code>POST /api/deployments/risk</code>. Sign in first in this browser, then submit pipeline and environment features.</p></div>
+{% endblock %}

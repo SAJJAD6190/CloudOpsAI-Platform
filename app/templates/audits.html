@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Audit Trail · CloudOpsAI{% endblock %}
+{% block content %}
+<header class="page-header"><div><span class="eyebrow">Governance</span><h1>Audit trail</h1><p>Trace recommendation, telemetry, deployment, and system events.</p></div></header>
+<div class="panel table-panel"><table><thead><tr><th>Time</th><th>Event</th><th>Target</th><th>Details</th></tr></thead><tbody>{% for item in audits %}<tr><td>{{ item.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td><td><strong>{{ item.event_type }}</strong></td><td>{{ item.target_type }} #{{ item.target_id }}</td><td class="wide-cell">{{ item.details }}</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

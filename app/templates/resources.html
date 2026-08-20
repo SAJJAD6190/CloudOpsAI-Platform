@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Resources · CloudOpsAI{% endblock %}
+{% block content %}
+<header class="page-header"><div><span class="eyebrow">Unified inventory</span><h1>Cloud resources</h1><p>Normalized resources from AWS, Azure, and Google Cloud.</p></div></header>
+<form class="filter-bar" method="get">
+  <select name="provider"><option value="">All providers</option>{% for item in providers %}<option value="{{ item }}" {% if item == selected_provider %}selected{% endif %}>{{ item }}</option>{% endfor %}</select>
+  <select name="status"><option value="">All statuses</option><option value="running" {% if selected_status == 'running' %}selected{% endif %}>Running</option><option value="stopped" {% if selected_status == 'stopped' %}selected{% endif %}>Stopped</option></select>
+  <button class="button secondary">Apply filters</button><a class="button ghost" href="/resources">Reset</a>
+</form>
+<div class="panel table-panel">
+<table>
+  <thead><tr><th>Resource</th><th>Provider</th><th>Type</th><th>Project</th><th>Environment</th><th>Region</th><th>Status</th><th>Monthly cost</th></tr></thead>
+  <tbody>
+  {% for resource in resources %}
+    <tr><td><strong>{{ resource.name }}</strong><small>{{ resource.native_id }}</small></td><td>{{ resource.account.provider }}</td><td>{{ resource.resource_type }}</td><td>{{ resource.project }}</td><td>{{ resource.environment }}</td><td>{{ resource.region }}</td><td><span class="status {{ resource.status }}">{{ resource.status }}</span></td><td>USD {{ '%.2f'|format(resource.monthly_cost) }}</td></tr>
+  {% else %}<tr><td colspan="8" class="empty">No matching resources.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

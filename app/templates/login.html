@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · CloudOpsAI</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body class="login-body">
+  <section class="login-card">
+    <div class="login-brand"><span class="brand-mark">C</span><h1>CloudOpsAI</h1></div>
+    <p>Intelligent multi-cloud resource management and DevOps decision support.</p>
+    {% if error %}<div class="error-box">{{ error }}</div>{% endif %}
+    <form method="post" action="/login" class="stack-form">
+      <label>Email<input type="email" name="email" value="admin@cloudopsai.local" required></label>
+      <label>Password<input type="password" name="password" value="admin123" required></label>
+      <button class="button primary" type="submit">Sign in</button>
+    </form>
+    <div class="demo-accounts">
+      <strong>Demo accounts</strong>
+      <code>admin@cloudopsai.local / admin123</code>
+      <code>engineer@cloudopsai.local / engineer123</code>
+      <code>finance@cloudopsai.local / finance123</code>
+      <code>security@cloudopsai.local / security123</code>
+    </div>
+    <small class="muted">Demonstration only. Do not use these credentials in production.</small>
+  </section>
+</body>
+</html>
